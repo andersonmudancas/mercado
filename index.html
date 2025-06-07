@@ -1,224 +1,589 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Controle de Gastos - Supermercado</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
-    body {
-      margin: 0;
-      padding: 2rem;
-      background: linear-gradient(to right, #f0f2f5, #e0e7ff);
-      color: #333;
-    }
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      background: #ffffff;
-      padding: 2rem;
-      border-radius: 20px;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
-    }
-    h1, h2 {
-      margin-top: 0;
-      color: #2c3e50;
-      text-align: center;
-    }
-    .form,
-    .filters,
-    .categoria-botoes {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 1rem;
-      justify-content: center;
-    }
-    .form input,
-    .form select,
-    .filters input,
-    .filters select {
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      flex: 1;
-      min-width: 160px;
-      font-size: 1rem;
-    }
-    .form button,
-    .filters button,
-    .export-btn,
-    .categoria-botoes button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 10px;
-      background: #007bff;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
-    .form button:hover,
-    .filters button:hover,
-    .export-btn:hover,
-    .categoria-botoes button:hover {
-      background: #0056b3;
-      transform: scale(1.05);
-    }
-    .form button.clear {
-      background: #6c757d;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1.5rem;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: center;
-    }
-    th {
-      background-color: #f8f9fa;
-      color: #333;
-    }
-    .total {
-      margin-top: 1.5rem;
-      font-weight: bold;
-      font-size: 1.3rem;
-      text-align: center;
-    }
-    .resumo {
-      margin-top: 1.5rem;
-      background: #f0f4f8;
-      padding: 1rem;
-      border-radius: 10px;
-    }
-    .actions button {
-      margin: 2px;
-      padding: 8px 14px;
-      font-size: 0.9rem;
-      border-radius: 8px;
-    }
-    .edit {
-      background: #ffc107;
-      color: #000;
-    }
-    .edit:hover {
-      background: #e0a800;
-    }
-    .remove {
-      background: #dc3545;
-      color: white;
-    }
-    .remove:hover {
-      background: #c82333;
-    }
-    .highlight {
-      background: #d4edda !important;
-      font-weight: bold;
-    }
-    @media (max-width: 768px) {
-      body {
-        padding: 1rem;
-      }
-      .form,
-      .filters,
-      .categoria-botoes {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .form input,
-      .form select,
-      .filters input,
-      .filters select,
-      .form button,
-      .filters button,
-      .export-btn,
-      .categoria-botoes button {
-        width: 100%;
-        font-size: 1rem;
-      }
-      table {
-        display: block;
-        overflow-x: auto;
-        width: 100%;
-      }
-      th, td {
-        white-space: nowrap;
-        font-size: 0.95rem;
-      }
-      .actions button {
-        margin: 4px 0;
-        width: 100%;
-      }
-      .total, .resumo {
-        font-size: 1.1rem;
-      }
-      h1 {
-        font-size: 1.8rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Controle de Gastos - Supermercado (Com Resumos)</title>
+    
+    <!-- Tailwind CSS para um design moderno e responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Biblioteca para exportar para Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- Ícones (usados para notificações e botões) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        /* Estilo para a fonte Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        /* Estilos para transições suaves e animações */
+        .transition-all {
+            transition: all 0.3s ease-in-out;
+        }
+        .toast-enter {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .toast-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Estilo para a aba ativa */
+        .tab-active {
+            border-color: #3b82f6; /* blue-500 */
+            color: #3b82f6;
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <h1>Controle de Gastos de Supermercado</h1>
+<body class="p-4 md:p-8">
 
-    <div class="categoria-botoes">
-      <button onclick="document.getElementById('categoria').value='Verduras e Legumes'">Verduras e Legumes</button>
-      <button onclick="document.getElementById('categoria').value='Frutas'">Frutas</button>
-      <button onclick="document.getElementById('categoria').value='Açougue'">Açougue</button>
-      <button onclick="document.getElementById('categoria').value='Limpeza'">Limpeza</button>
-      <button onclick="document.getElementById('categoria').value='Outros'">Outros</button>
+    <div class="container max-w-7xl mx-auto bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+
+        <!-- Título -->
+        <h1 class="text-3xl font-bold text-slate-800 mb-4">Controle de Gastos de Supermercado</h1>
+
+        <!-- Navegação em Abas -->
+        <div class="mb-6 border-b border-slate-200">
+            <nav class="-mb-px flex space-x-6">
+                <button id="lancamentos-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-active">
+                    Lançamentos
+                </button>
+                <button id="resumo-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300">
+                    Resumo Detalhado
+                </button>
+            </nav>
+        </div>
+
+        <!-- Conteúdo da Aba de Lançamentos -->
+        <div id="lancamentos-view">
+            <!-- Formulário de Adição/Edição -->
+            <div class="form-container bg-slate-50 p-6 rounded-xl border border-slate-200 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <input type="text" id="produto" placeholder="Produto" class="col-span-1 md:col-span-2 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                    <select id="supermercado" class="p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                        <option value="" disabled selected>Selecione o Supermercado</option>
+                        <option value="Tauste">Tauste</option>
+                        <option value="Panelão">Panelão</option>
+                        <option value="Confiança">Confiança</option>
+                    </select>
+                     <select id="categoria" class="p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                        <option value="" disabled selected>Selecione a Categoria</option>
+                        <option value="Verduras e Legumes">Verduras e Legumes</option>
+                        <option value="Frutas">Frutas</option>
+                        <option value="Açougue">Açougue</option>
+                        <option value="Mercearia">Mercearia</option>
+                        <option value="Higiene">Higiene</option>
+                        <option value="Limpeza">Limpeza</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                    <input type="number" id="quantidade" placeholder="Qtd" class="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                    <select id="unidade" class="p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                        <option value="un">un</option>
+                        <option value="kg">kg</option>
+                        <option value="g">g</option>
+                        <option value="L">L</option>
+                        <option value="ml">ml</option>
+                    </select>
+                    <input type="number" id="preco" placeholder="Preço R$" class="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                    <input type="date" id="data" class="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                </div>
+                <div class="flex flex-col md:flex-row gap-3 mt-4">
+                    <button id="add-btn" class="w-full md:w-auto bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-all flex-grow">
+                        <i class="fas fa-plus mr-2"></i> Adicionar Item
+                    </button>
+                    <button id="clear-form-btn" class="w-full md:w-auto bg-slate-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-slate-600 transition-all">
+                       <i class="fas fa-eraser mr-2"></i> Limpar Campos
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Filtros e Ações -->
+            <div class="filters-container flex flex-col md:flex-row gap-4 items-center mb-6">
+                 <select id="filtroMercado" class="w-full md:w-auto p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                    <option value="">Todos os Supermercados</option>
+                    <option value="Tauste">Tauste</option>
+                    <option value="Panelão">Panelão</option>
+                    <option value="Confiança">Confiança</option>
+                </select>
+                <input type="month" id="filtroMes" class="w-full md:w-auto p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                <div class="flex-grow"></div>
+                <button id="export-btn" class="w-full md:w-auto bg-green-600 text-white font-semibold py-3 px-5 rounded-lg hover:bg-green-700 transition-all"><i class="fas fa-file-excel mr-2"></i>Exportar</button>
+                <button id="clear-all-btn" class="w-full md:w-auto bg-red-600 text-white font-semibold py-3 px-5 rounded-lg hover:bg-red-700 transition-all"><i class="fas fa-trash mr-2"></i>Limpar Tudo</button>
+            </div>
+
+            <!-- Tabela de Itens -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 rounded-l-lg">Produto</th>
+                            <th scope="col" class="px-4 py-3">Supermercado</th>
+                            <th scope="col" class="px-4 py-3">Comparativo</th>
+                            <th scope="col" class="px-4 py-3 text-center">Qtd</th>
+                            <th scope="col" class="px-4 py-3">Preço</th>
+                            <th scope="col" class="px-4 py-3">Total</th>
+                            <th scope="col" class="px-4 py-3">Data</th>
+                            <th scope="col" class="px-4 py-3 text-center rounded-r-lg">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-corpo"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Conteúdo da Aba de Resumo -->
+        <div id="resumo-view" class="hidden">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">Resumo de Gastos do Mês</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card de Gasto Mensal Total -->
+                <div id="resumo-mensal" class="md:col-span-3 bg-blue-100 text-blue-800 p-6 rounded-xl text-center">
+                    <!-- Conteúdo gerado via JS -->
+                </div>
+
+                <!-- Card de Resumo por Categoria -->
+                <div id="resumo-categoria" class="md:col-span-1 bg-slate-50 border border-slate-200 p-6 rounded-xl">
+                    <!-- Conteúdo gerado via JS -->
+                </div>
+
+                 <!-- Card de Resumo por Supermercado -->
+                <div id="resumo-supermercado" class="md:col-span-1 bg-slate-50 border border-slate-200 p-6 rounded-xl">
+                    <!-- Conteúdo gerado via JS -->
+                </div>
+
+                <!-- Card de Resumo por Dia -->
+                <div id="resumo-diario" class="md:col-span-1 bg-slate-50 border border-slate-200 p-6 rounded-xl">
+                    <!-- Conteúdo gerado via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Confirmação -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden transition-all">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-4">
+            <h3 class="text-xl font-bold text-slate-800 mb-4" id="modal-title">Confirmar Ação</h3>
+            <p class="text-slate-600 mb-6" id="modal-message">Você tem certeza?</p>
+            <div class="flex justify-end gap-4">
+                <button id="modal-cancel" class="bg-slate-200 text-slate-800 font-semibold py-2 px-5 rounded-lg hover:bg-slate-300 transition-all">Cancelar</button>
+                <button id="modal-confirm" class="bg-red-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-red-700 transition-all">Confirmar</button>
+            </div>
+        </div>
     </div>
 
-    <div class="form">
-      <input type="text" id="produto" placeholder="Produto" />
-      <input type="text" id="categoria" placeholder="Categoria" />
-      <input type="text" id="supermercado" placeholder="Supermercado" />
-      <input type="number" id="quantidade" placeholder="Quantidade" />
-      <select id="unidade">
-        <option value="kg">kg</option>
-        <option value="g">g</option>
-        <option value="un">un</option>
-      </select>
-      <input type="number" id="preco" placeholder="Preço R$" />
-      <input type="date" id="data" />
-      <button onclick="adicionarItem()">Adicionar</button>
-      <button class="clear" onclick="limparTudo()">Limpar Tudo</button>
-    </div>
+    <!-- Container para Notificações (Toast) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3"></div>
 
-    <div class="filters">
-      <input type="date" id="filtroData" onchange="renderTabela()" />
-      <input type="text" id="filtroMercado" placeholder="Filtrar por supermercado" oninput="renderTabela()" />
-      <button onclick="exportarExcel()" class="export-btn">Exportar Excel</button>
-    </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
 
-    <table id="tabela">
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th>Categoria</th>
-          <th>Supermercado</th>
-          <th>Qtd</th>
-          <th>Preço</th>
-          <th>Diferença</th>
-          <th>Total</th>
-          <th>Data</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    // -------------------------------------------------------------------------
+    // Estado da Aplicação e Elementos do DOM
+    // -------------------------------------------------------------------------
+    
+    const state = {
+        items: [],
+        editIndex: -1,
+    };
 
-    <div class="total" id="total"></div>
-    <div class="resumo" id="resumo"></div>
-  </div>
+    const UIElements = {
+        // Abas
+        lancamentosTab: document.getElementById('lancamentos-tab'),
+        resumoTab: document.getElementById('resumo-tab'),
+        lancamentosView: document.getElementById('lancamentos-view'),
+        resumoView: document.getElementById('resumo-view'),
+        
+        // Formulário
+        produto: document.getElementById('produto'),
+        supermercado: document.getElementById('supermercado'),
+        categoria: document.getElementById('categoria'),
+        quantidade: document.getElementById('quantidade'),
+        unidade: document.getElementById('unidade'),
+        preco: document.getElementById('preco'),
+        data: document.getElementById('data'),
+        addBtn: document.getElementById('add-btn'),
+        clearFormBtn: document.getElementById('clear-form-btn'),
+        
+        // Filtros e Ações
+        filtroMercado: document.getElementById('filtroMercado'),
+        filtroMes: document.getElementById('filtroMes'),
+        exportBtn: document.getElementById('export-btn'),
+        clearAllBtn: document.getElementById('clear-all-btn'),
+        
+        // Exibição de Dados
+        tabelaCorpo: document.getElementById('tabela-corpo'),
+        resumoMensal: document.getElementById('resumo-mensal'),
+        resumoCategoria: document.getElementById('resumo-categoria'),
+        resumoSupermercado: document.getElementById('resumo-supermercado'),
+        resumoDiario: document.getElementById('resumo-diario'),
+
+        // Modal e Toast
+        modal: document.getElementById('modal'),
+        modalTitle: document.getElementById('modal-title'),
+        modalMessage: document.getElementById('modal-message'),
+        modalConfirm: document.getElementById('modal-confirm'),
+        modalCancel: document.getElementById('modal-cancel'),
+        toastContainer: document.getElementById('toast-container'),
+    };
+
+    // -------------------------------------------------------------------------
+    // Lógica de Navegação
+    // -------------------------------------------------------------------------
+
+    const switchTab = (tabName) => {
+        if (tabName === 'resumo') {
+            UIElements.lancamentosView.classList.add('hidden');
+            UIElements.resumoView.classList.remove('hidden');
+            UIElements.lancamentosTab.classList.remove('tab-active');
+            UIElements.resumoTab.classList.add('tab-active');
+            render(); 
+        } else { 
+            UIElements.resumoView.classList.add('hidden');
+            UIElements.lancamentosView.classList.remove('hidden');
+            UIElements.resumoTab.classList.remove('tab-active');
+            UIElements.lancamentosTab.classList.add('tab-active');
+        }
+    };
+    
+    // -------------------------------------------------------------------------
+    // Funções Utilitárias
+    // -------------------------------------------------------------------------
+    
+    const saveState = () => localStorage.setItem('itensGastosSupermercadoV4', JSON.stringify(state.items));
+    const loadState = () => {
+        const savedItems = localStorage.getItem('itensGastosSupermercadoV4');
+        if (savedItems) state.items = JSON.parse(savedItems);
+    };
+
+    const showToast = (message, type = 'success') => {
+        const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+        const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
+        const toast = document.createElement('div');
+        toast.className = `flex items-center text-white p-4 rounded-lg shadow-md transition-all toast-enter ${colors[type]}`;
+        toast.innerHTML = `<i class="fas ${icons[type]} mr-3"></i> <p>${message}</p>`;
+        UIElements.toastContainer.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('toast-enter-active'));
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, 3000);
+    };
+
+    const showModal = (title, message, onConfirm) => {
+        UIElements.modalTitle.textContent = title;
+        UIElements.modalMessage.textContent = message;
+        UIElements.modal.classList.remove('hidden');
+        const newConfirmBtn = UIElements.modalConfirm.cloneNode(true);
+        UIElements.modalConfirm.parentNode.replaceChild(newConfirmBtn, UIElements.modalConfirm);
+        UIElements.modalConfirm = newConfirmBtn;
+        UIElements.modalConfirm.onclick = () => { onConfirm(); hideModal(); };
+    };
+    
+    const hideModal = () => UIElements.modal.classList.add('hidden');
+    
+    const formatCurrency = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    
+    const formatDate = (dateString) => new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+
+    // -------------------------------------------------------------------------
+    // Lógica Principal (CRUD de Itens)
+    // -------------------------------------------------------------------------
+
+    const clearForm = () => {
+        UIElements.produto.value = '';
+        UIElements.supermercado.value = '';
+        UIElements.categoria.value = '';
+        UIElements.quantidade.value = '';
+        UIElements.preco.value = '';
+        UIElements.data.value = '';
+        UIElements.unidade.value = 'un';
+        state.editIndex = -1;
+        UIElements.addBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> Adicionar Item';
+        UIElements.addBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+        UIElements.addBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        UIElements.produto.focus();
+    };
+
+    const handleAddItem = () => {
+        const produto = UIElements.produto.value.trim();
+        const supermercado = UIElements.supermercado.value;
+        const categoria = UIElements.categoria.value;
+        const quantidade = parseFloat(UIElements.quantidade.value);
+        const preco = parseFloat(UIElements.preco.value);
+        const data = UIElements.data.value || new Date().toISOString().split('T')[0];
+
+        if (!produto || !supermercado || !categoria || isNaN(quantidade) || isNaN(preco) || !data) {
+            showToast('Por favor, preencha todos os campos.', 'error');
+            return;
+        }
+
+        const item = {
+            id: state.editIndex > -1 ? state.items[state.editIndex].id : Date.now(),
+            produto, supermercado, categoria, quantidade, preco, data,
+            unidade: UIElements.unidade.value,
+        };
+        
+        if (state.editIndex > -1) {
+            state.items[state.editIndex] = item;
+            showToast('Item atualizado com sucesso!');
+        } else {
+            state.items.push(item);
+            showToast('Item adicionado com sucesso!');
+        }
+
+        clearForm();
+        render();
+        saveState();
+    };
+    
+    const handleEditItem = (index) => {
+        const item = state.items[index];
+        if (!item) return;
+
+        UIElements.produto.value = item.produto;
+        UIElements.supermercado.value = item.supermercado;
+        UIElements.categoria.value = item.categoria;
+        UIElements.quantidade.value = item.quantidade;
+        UIElements.unidade.value = item.unidade;
+        UIElements.preco.value = item.preco;
+        UIElements.data.value = item.data;
+        state.editIndex = index;
+
+        UIElements.addBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Atualizar Item';
+        UIElements.addBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        UIElements.addBtn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+        
+        switchTab('lancamentos');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        UIElements.produto.focus();
+    };
+
+    const handleRemoveItem = (index) => {
+        showModal(
+            'Excluir Item',
+            `Tem certeza que deseja excluir o item "${state.items[index].produto}"?`,
+            () => {
+                state.items.splice(index, 1);
+                render();
+                saveState();
+                showToast('Item excluído.', 'info');
+            }
+        );
+    };
+
+    const handleClearAll = () => {
+        showModal(
+            'Limpar Tudo',
+            'Você tem certeza que deseja apagar TODOS os itens? Esta ação é irreversível.',
+            () => {
+                state.items = [];
+                state.editIndex = -1;
+                clearForm();
+                render();
+                saveState();
+                showToast('Todos os itens foram apagados.', 'info');
+            }
+        );
+    };
+
+    // -------------------------------------------------------------------------
+    // Funções de Análise e Comparação de Preços
+    // -------------------------------------------------------------------------
+
+    const getPriceComparisonData = () => {
+        const priceGroups = {};
+        // Usa todos os itens para a comparação, não apenas os filtrados
+        state.items.forEach(item => {
+            const productNameKey = item.produto.trim().toLowerCase();
+            if (!priceGroups[productNameKey]) {
+                priceGroups[productNameKey] = [];
+            }
+            priceGroups[productNameKey].push(item);
+        });
+
+        const minPrices = {};
+        for (const product in priceGroups) {
+            minPrices[product] = Math.min(...priceGroups[product].map(i => i.preco));
+        }
+        return { priceGroups, minPrices };
+    };
+    
+    // -------------------------------------------------------------------------
+    // Renderização
+    // -------------------------------------------------------------------------
+
+    const renderSummary = (items) => {
+        const summary = items.reduce((acc, item) => {
+            const total = item.quantidade * item.preco;
+            acc.totalGeral += total;
+            acc.categorias[item.categoria] = (acc.categorias[item.categoria] || 0) + total;
+            acc.supermercados[item.supermercado] = (acc.supermercados[item.supermercado] || 0) + total;
+            const dia = formatDate(item.data);
+            acc.dias[dia] = (acc.dias[dia] || 0) + total;
+            return acc;
+        }, { totalGeral: 0, categorias: {}, supermercados: {}, dias: {} });
+        
+        UIElements.resumoMensal.innerHTML = `
+            <h3 class="text-lg font-bold text-blue-900 mb-2">Gasto Total no Mês Filtrado</h3>
+            <p class="text-4xl font-bold text-blue-900">${formatCurrency(summary.totalGeral)}</p>`;
+
+        const renderList = (title, dataObject) => {
+            let html = `<h3 class="text-lg font-bold text-slate-800 mb-4">${title}</h3>`;
+            const sorted = Object.entries(dataObject).sort(([,a],[,b]) => b - a);
+            if (sorted.length > 0) {
+                html += '<ul class="space-y-2">';
+                sorted.forEach(([key, value]) => {
+                    html += `<li class="flex justify-between items-center text-slate-700"><span>${key}</span><strong class="font-semibold text-slate-900">${formatCurrency(value)}</strong></li>`;
+                });
+                html += '</ul>';
+            } else {
+                html += '<p class="text-slate-500">Nenhum gasto registrado.</p>';
+            }
+            return html;
+        };
+
+        UIElements.resumoCategoria.innerHTML = renderList('Por Categoria', summary.categorias);
+        UIElements.resumoSupermercado.innerHTML = renderList('Por Supermercado', summary.supermercados);
+        UIElements.resumoDiario.innerHTML = renderList('Por Dia', summary.dias);
+    };
+    
+    const render = () => {
+        const filtroMercado = UIElements.filtroMercado.value;
+        const filtroMes = UIElements.filtroMes.value || new Date().toISOString().slice(0, 7);
+        if (!UIElements.filtroMes.value) { UIElements.filtroMes.value = filtroMes; }
+
+        const filteredItems = state.items.filter(item => 
+            (!filtroMercado || item.supermercado === filtroMercado) &&
+            (!filtroMes || item.data.startsWith(filtroMes))
+        );
+        
+        const { priceGroups, minPrices } = getPriceComparisonData();
+
+        UIElements.tabelaCorpo.innerHTML = '';
+        if (filteredItems.length === 0) {
+            UIElements.tabelaCorpo.innerHTML = `<tr><td colspan="8" class="text-center p-8 text-slate-500">Nenhum item encontrado.</td></tr>`;
+        }
+
+        const sortedFilteredItems = filteredItems.sort((a, b) => new Date(b.data) - new Date(a.data) || a.produto.localeCompare(b.produto));
+
+        sortedFilteredItems.forEach(item => {
+            const originalIndex = state.items.findIndex(i => i.id === item.id);
+            const productNameKey = item.produto.trim().toLowerCase();
+            const menorPreco = minPrices[productNameKey];
+            
+            let comparativoHTML = '-';
+            if (priceGroups[productNameKey] && priceGroups[productNameKey].length > 1) {
+                if (item.preco <= menorPreco) {
+                    comparativoHTML = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                          <i class="fas fa-check-circle mr-1.5"></i> Melhor Preço
+                                       </span>`;
+                } else {
+                    const diferenca = (((item.preco - menorPreco) / menorPreco) * 100);
+                    comparativoHTML = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                          +${diferenca.toFixed(0)}%
+                                       </span>`;
+                }
+            }
+
+            const tr = document.createElement('tr');
+            tr.className = `bg-white border-b hover:bg-slate-50`;
+            tr.innerHTML = `
+                <td class="px-4 py-4 font-medium text-slate-900">${item.produto} <span class="text-slate-500 font-normal">(${item.categoria})</span></td>
+                <td class="px-4 py-4">${item.supermercado}</td>
+                <td class="px-4 py-4">${comparativoHTML}</td>
+                <td class="px-4 py-4 text-center">${item.quantidade} ${item.unidade}</td>
+                <td class="px-4 py-4">${formatCurrency(item.preco)}</td>
+                <td class="px-4 py-4 font-semibold">${formatCurrency(item.quantidade * item.preco)}</td>
+                <td class="px-4 py-4">${formatDate(item.data)}/${item.data.slice(0, 4)}</td>
+                <td class="px-4 py-4 text-center">
+                    <button class="edit-btn text-blue-600 hover:text-blue-800 p-2" title="Editar"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="remove-btn text-red-600 hover:text-red-800 p-2" title="Excluir"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            `;
+            tr.querySelector('.edit-btn').addEventListener('click', () => handleEditItem(originalIndex));
+            tr.querySelector('.remove-btn').addEventListener('click', () => handleRemoveItem(originalIndex));
+            UIElements.tabelaCorpo.appendChild(tr);
+        });
+
+        renderSummary(filteredItems);
+    };
+
+    // -------------------------------------------------------------------------
+    // Exportação
+    // -------------------------------------------------------------------------
+
+    const handleExportExcel = () => {
+        const filtroMercado = UIElements.filtroMercado.value;
+        const filtroMes = UIElements.filtroMes.value;
+        const filteredItems = state.items.filter(item => 
+            (!filtroMercado || item.supermercado === filtroMercado) &&
+            (!filtroMes || item.data.startsWith(filtroMes))
+        );
+        
+        if (filteredItems.length === 0) {
+            showToast('Nenhum dado para exportar com os filtros atuais.', 'info');
+            return;
+        }
+
+        const { priceGroups, minPrices } = getPriceComparisonData();
+
+        const dataToExport = filteredItems.map(item => {
+            const productNameKey = item.produto.trim().toLowerCase();
+            const menorPreco = minPrices[productNameKey];
+            let comparativo = '-';
+
+            if (priceGroups[productNameKey] && priceGroups[productNameKey].length > 1) {
+                if (item.preco <= menorPreco) {
+                    comparativo = 'Melhor Preço';
+                } else {
+                    const diferenca = (((item.preco - menorPreco) / menorPreco) * 100);
+                    comparativo = `+${diferenca.toFixed(0)}%`;
+                }
+            }
+
+            return {
+                'Produto': item.produto,
+                'Categoria': item.categoria,
+                'Supermercado': item.supermercado,
+                'Comparativo de Preço': comparativo,
+                'Quantidade': `${item.quantidade} ${item.unidade}`,
+                'Preço Unitário': item.preco,
+                'Total': item.quantidade * item.preco,
+                'Data': formatDate(item.data) + '/' + item.data.slice(0, 4)
+            };
+        });
+        
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Gastos');
+        worksheet['!cols'] = [ {wch: 30}, {wch: 20}, {wch: 20}, {wch: 20}, {wch: 15}, {wch: 15}, {wch: 15}, {wch:15} ];
+        XLSX.writeFile(workbook, `gastos_supermercado_${filtroMes || 'geral'}.xlsx`);
+        showToast('Dados exportados para Excel!', 'success');
+    };
+
+    // -------------------------------------------------------------------------
+    // Event Listeners e Inicialização
+    // -------------------------------------------------------------------------
+    
+    UIElements.lancamentosTab.addEventListener('click', () => switchTab('lancamentos'));
+    UIElements.resumoTab.addEventListener('click', () => switchTab('resumo'));
+    UIElements.addBtn.addEventListener('click', handleAddItem);
+    UIElements.clearFormBtn.addEventListener('click', clearForm);
+    UIElements.clearAllBtn.addEventListener('click', handleClearAll);
+    UIElements.exportBtn.addEventListener('click', handleExportExcel);
+    UIElements.filtroMercado.addEventListener('change', render);
+    UIElements.filtroMes.addEventListener('change', render);
+    UIElements.modalCancel.addEventListener('click', hideModal);
+    UIElements.modal.addEventListener('click', (e) => e.target === UIElements.modal && hideModal());
+
+    loadState();
+    render();
+});
+</script>
+
 </body>
 </html>
