@@ -14,87 +14,96 @@
     body {
       margin: 0;
       padding: 2rem;
-      background: #eef2f5;
+      background: linear-gradient(to right, #f0f2f5, #e0e7ff);
       color: #333;
     }
     .container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: auto;
-      background: #fff;
+      background: #ffffff;
       padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      border-radius: 20px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
     }
     h1, h2 {
       margin-top: 0;
       color: #2c3e50;
+      text-align: center;
     }
     .form,
-    .filters {
+    .filters,
+    .categoria-botoes {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 1rem;
+      justify-content: center;
     }
     .form input,
     .form select,
     .filters input,
     .filters select {
-      padding: 10px;
+      padding: 12px;
       border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 10px;
       flex: 1;
-      min-width: 150px;
+      min-width: 160px;
+      font-size: 1rem;
     }
     .form button,
     .filters button,
-    .export-btn {
-      padding: 10px 20px;
+    .export-btn,
+    .categoria-botoes button {
+      padding: 12px 24px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #007bff;
       color: white;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s ease-in-out;
     }
     .form button:hover,
     .filters button:hover,
-    .export-btn:hover {
+    .export-btn:hover,
+    .categoria-botoes button:hover {
       background: #0056b3;
+      transform: scale(1.05);
     }
     .form button.clear {
-      background: #555;
+      background: #6c757d;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
     }
     th, td {
       border: 1px solid #ddd;
-      padding: 10px;
+      padding: 12px;
       text-align: center;
     }
     th {
-      background-color: #f1f1f1;
+      background-color: #f8f9fa;
+      color: #333;
     }
     .total {
-      margin-top: 1rem;
+      margin-top: 1.5rem;
       font-weight: bold;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
+      text-align: center;
     }
     .resumo {
-      margin-top: 1rem;
-      background: #f8f8f8;
+      margin-top: 1.5rem;
+      background: #f0f4f8;
       padding: 1rem;
-      border-radius: 8px;
+      border-radius: 10px;
     }
     .actions button {
-      margin: 0 2px;
-      padding: 5px 10px;
+      margin: 2px;
+      padding: 8px 14px;
       font-size: 0.9rem;
-      border-radius: 6px;
+      border-radius: 8px;
     }
     .edit {
       background: #ffc107;
@@ -114,15 +123,15 @@
       background: #d4edda !important;
       font-weight: bold;
     }
-
-    /* Responsividade para telas pequenas */
     @media (max-width: 768px) {
       body {
         padding: 1rem;
       }
       .form,
-      .filters {
+      .filters,
+      .categoria-botoes {
         flex-direction: column;
+        align-items: stretch;
       }
       .form input,
       .form select,
@@ -130,7 +139,8 @@
       .filters select,
       .form button,
       .filters button,
-      .export-btn {
+      .export-btn,
+      .categoria-botoes button {
         width: 100%;
         font-size: 1rem;
       }
@@ -141,17 +151,17 @@
       }
       th, td {
         white-space: nowrap;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
       }
       .actions button {
-        margin: 2px 0;
+        margin: 4px 0;
         width: 100%;
       }
       .total, .resumo {
-        font-size: 1rem;
+        font-size: 1.1rem;
       }
       h1 {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
       }
     }
   </style>
@@ -159,8 +169,18 @@
 <body>
   <div class="container">
     <h1>Controle de Gastos de Supermercado</h1>
+
+    <div class="categoria-botoes">
+      <button onclick="document.getElementById('categoria').value='Verduras e Legumes'">Verduras e Legumes</button>
+      <button onclick="document.getElementById('categoria').value='Frutas'">Frutas</button>
+      <button onclick="document.getElementById('categoria').value='Açougue'">Açougue</button>
+      <button onclick="document.getElementById('categoria').value='Limpeza'">Limpeza</button>
+      <button onclick="document.getElementById('categoria').value='Outros'">Outros</button>
+    </div>
+
     <div class="form">
       <input type="text" id="produto" placeholder="Produto" />
+      <input type="text" id="categoria" placeholder="Categoria" />
       <input type="text" id="supermercado" placeholder="Supermercado" />
       <input type="number" id="quantidade" placeholder="Quantidade" />
       <select id="unidade">
@@ -184,6 +204,7 @@
       <thead>
         <tr>
           <th>Produto</th>
+          <th>Categoria</th>
           <th>Supermercado</th>
           <th>Qtd</th>
           <th>Preço</th>
@@ -199,164 +220,5 @@
     <div class="total" id="total"></div>
     <div class="resumo" id="resumo"></div>
   </div>
-
-  <script>
-    let itens = [];
-    let editando = -1;
-
-    const dadosSalvos = localStorage.getItem("itensGastos");
-    if (dadosSalvos) {
-      itens = JSON.parse(dadosSalvos);
-    }
-
-    function adicionarItem() {
-      const produto = document.getElementById("produto").value;
-      const supermercado = document.getElementById("supermercado").value;
-      const quantidade = parseFloat(document.getElementById("quantidade").value);
-      const unidade = document.getElementById("unidade").value;
-      const preco = parseFloat(document.getElementById("preco").value);
-      const data = document.getElementById("data").value || new Date().toISOString().split("T")[0];
-      if (!produto || !supermercado || isNaN(quantidade) || isNaN(preco)) return;
-      const item = {
-        produto,
-        supermercado,
-        quantidade,
-        unidade,
-        preco,
-        data: data.split("-").reverse().join("/")
-      };
-      if (editando > -1) {
-        itens[editando] = item;
-        editando = -1;
-      } else {
-        itens.push(item);
-      }
-      limparFormulario();
-      renderTabela();
-    }
-
-    function limparFormulario() {
-      document.getElementById("produto").value = "";
-      document.getElementById("supermercado").value = "";
-      document.getElementById("quantidade").value = "";
-      document.getElementById("preco").value = "";
-      document.getElementById("data").value = "";
-    }
-
-    function limparTudo() {
-      if (confirm("Tem certeza que deseja apagar todos os dados?")) {
-        itens = [];
-        localStorage.removeItem("itensGastos");
-        renderTabela();
-      }
-    }
-
-    function editarItem(i) {
-      const item = itens[i];
-      document.getElementById("produto").value = item.produto;
-      document.getElementById("supermercado").value = item.supermercado;
-      document.getElementById("quantidade").value = item.quantidade;
-      document.getElementById("unidade").value = item.unidade;
-      document.getElementById("preco").value = item.preco;
-      document.getElementById("data").value = item.data.split("/").reverse().join("-");
-      editando = i;
-    }
-
-    function removerItem(i) {
-      itens.splice(i, 1);
-      renderTabela();
-    }
-
-    function renderTabela() {
-      const corpo = document.querySelector("#tabela tbody");
-      corpo.innerHTML = "";
-      const filtroData = document.getElementById("filtroData").value;
-      const filtroMercado = document.getElementById("filtroMercado").value.toLowerCase();
-      const grupos = {};
-      itens.forEach((item, i) => {
-        const nome = item.produto.trim().toLowerCase();
-        if (!grupos[nome]) grupos[nome] = [];
-        grupos[nome].push({ ...item, index: i });
-      });
-      let totalGeral = 0;
-      itens.forEach((item, i) => {
-        if (filtroData && item.data.split("/").reverse().join("-") !== filtroData) return;
-        if (filtroMercado && item.supermercado.toLowerCase() !== filtroMercado) return;
-        const grupo = grupos[item.produto.trim().toLowerCase()];
-        const menorPreco = Math.min(...grupo.map(i => i.preco));
-        const diferenca = (grupo.length > 1 && item.preco !== menorPreco)
-          ? `${(((item.preco - menorPreco) / menorPreco) * 100).toFixed(1)}%`
-          : "-";
-        const total = item.quantidade * item.preco;
-        totalGeral += total;
-        const tr = document.createElement("tr");
-        if (item.preco === menorPreco && grupo.length > 1) tr.classList.add("highlight");
-        tr.innerHTML = `
-          <td>${item.produto}</td>
-          <td>${item.supermercado}</td>
-          <td>${item.quantidade} ${item.unidade}</td>
-          <td>R$ ${item.preco.toFixed(2)}</td>
-          <td>${diferenca}</td>
-          <td>R$ ${total.toFixed(2)}</td>
-          <td>${item.data}</td>
-          <td class="actions">
-            <button class="edit" onclick="editarItem(${i})">Editar</button>
-            <button class="remove" onclick="removerItem(${i})">Excluir</button>
-          </td>
-        `;
-        corpo.appendChild(tr);
-      });
-      document.getElementById("total").innerText = `Total Geral: R$ ${totalGeral.toFixed(2)}`;
-      const resumo = {};
-      itens.forEach(item => {
-        if (!resumo[item.supermercado]) resumo[item.supermercado] = 0;
-        resumo[item.supermercado] += item.quantidade * item.preco;
-      });
-      let resHTML = "<h2>Resumo por Supermercado</h2><ul>";
-      for (const mercado in resumo) {
-        resHTML += `<li><strong>${mercado}</strong>: R$ ${resumo[mercado].toFixed(2)}</li>`;
-      }
-      resHTML += "</ul>";
-      document.getElementById("resumo").innerHTML = resHTML;
-      localStorage.setItem("itensGastos", JSON.stringify(itens));
-    }
-
-    function exportarExcel() {
-      const wb = XLSX.utils.book_new();
-      const dados = [["Produto", "Supermercado", "Quantidade", "Preço Unitário", "Diferença", "Total", "Data"]];
-      const filtroData = document.getElementById("filtroData").value;
-      const filtroMercado = document.getElementById("filtroMercado").value.toLowerCase();
-      const grupos = {};
-      itens.forEach((item, i) => {
-        const nome = item.produto.trim().toLowerCase();
-        if (!grupos[nome]) grupos[nome] = [];
-        grupos[nome].push({ ...item, index: i });
-      });
-      itens.forEach(item => {
-        if (filtroData && item.data.split("/").reverse().join("-") !== filtroData) return;
-        if (filtroMercado && item.supermercado.toLowerCase() !== filtroMercado) return;
-        const grupo = grupos[item.produto.trim().toLowerCase()];
-        const menorPreco = Math.min(...grupo.map(i => i.preco));
-        const diferenca = (grupo.length > 1 && item.preco !== menorPreco)
-          ? `${(((item.preco - menorPreco) / menorPreco) * 100).toFixed(1)}%`
-          : '-';
-        const total = item.quantidade * item.preco;
-        dados.push([
-          item.produto,
-          item.supermercado,
-          `${item.quantidade} ${item.unidade}`,
-          `R$ ${item.preco.toFixed(2)}`,
-          diferenca,
-          `R$ ${total.toFixed(2)}`,
-          item.data
-        ]);
-      });
-      const ws = XLSX.utils.aoa_to_sheet(dados);
-      XLSX.utils.book_append_sheet(wb, ws, "Gastos");
-      XLSX.writeFile(wb, "gastos_supermercado.xlsx");
-    }
-
-    renderTabela();
-  </script>
 </body>
 </html>
