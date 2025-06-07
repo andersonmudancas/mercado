@@ -38,6 +38,12 @@
             border-color: #3b82f6; /* blue-500 */
             color: #3b82f6;
         }
+        /* Estilo para o botão de seleção azul (categoria, supermercado, etc.) */
+        .btn-selected-blue {
+            background-color: #3b82f6 !important;
+            color: white !important;
+            border-color: #3b82f6 !important;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -64,23 +70,32 @@
             <!-- Formulário de Adição/Edição -->
             <div class="form-container bg-slate-50 p-6 rounded-xl border border-slate-200 mb-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <input type="text" id="produto" placeholder="Produto" class="col-span-1 md:col-span-2 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                    <select id="supermercado" class="p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                        <option value="" disabled selected>Selecione o Supermercado</option>
-                        <option value="Tauste">Tauste</option>
-                        <option value="Panelão">Panelão</option>
-                        <option value="Confiança">Confiança</option>
-                    </select>
-                     <select id="categoria" class="p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                        <option value="" disabled selected>Selecione a Categoria</option>
-                        <option value="Verduras e Legumes">Verduras e Legumes</option>
-                        <option value="Frutas">Frutas</option>
-                        <option value="Açougue">Açougue</option>
-                        <option value="Mercearia">Mercearia</option>
-                        <option value="Higiene">Higiene</option>
-                        <option value="Limpeza">Limpeza</option>
-                        <option value="Outros">Outros</option>
-                    </select>
+                    <input type="text" id="produto" placeholder="Produto" class="col-span-1 md:col-span-4 lg:col-span-3 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                    <input type="date" id="data" class="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                </div>
+                 <!-- Botões de Supermercado -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Supermercado</label>
+                    <div id="supermercado-buttons" class="flex flex-wrap gap-2">
+                        <button data-supermercado="Tauste" class="supermercado-btn flex-grow text-center py-2 px-4 border rounded-lg transition-all hover:bg-slate-200">Tauste</button>
+                        <button data-supermercado="Panelão" class="supermercado-btn flex-grow text-center py-2 px-4 border rounded-lg transition-all hover:bg-slate-200">Panelão</button>
+                        <button data-supermercado="Confiança" class="supermercado-btn flex-grow text-center py-2 px-4 border rounded-lg transition-all hover:bg-slate-200">Confiança</button>
+                    </div>
+                </div>
+                 <!-- Botões de Categoria -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Categoria</label>
+                    <div id="categoria-buttons" class="flex flex-wrap gap-2">
+                        <button data-category="Verduras e Legumes" class="category-btn flex-grow text-center py-2 px-4 border rounded-lg transition-all hover:bg-slate-200">Verduras e Legumes</button>
+                        <button data-category="Frutas" class="category-btn flex-grow text-center py-2 px-4 border rounded-lg transition-all hover:bg-slate-200">Frutas</button>
+                        <button data-category="Açougue" class="category-btn flex-grow text-center py-2 px-4 border rounded-lg transition-all hover:bg-slate-200">Açougue</button>
+                        <button data-category="Mercearia" class="category-btn flex-grow text-center py-2 px-4 border rounded-lg transition-all hover:bg-slate-200">Mercearia</button>
+                        <button data-category="Higiene" class="category-btn flex-grow text-center py-2 px-4 border rounded-lg transition-all hover:bg-slate-200">Higiene</button>
+                        <button data-category="Limpeza" class="category-btn flex-grow text-center py-2 px-4 border rounded-lg transition-all hover:bg-slate-200">Limpeza</button>
+                        <button data-category="Outros" class="category-btn flex-grow text-center py-2 px-4 border rounded-lg transition-all hover:bg-slate-200">Outros</button>
+                    </div>
+                </div>
+                 <div class="grid grid-cols-3 gap-4 mt-4">
                     <input type="number" id="quantidade" placeholder="Qtd" class="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                     <select id="unidade" class="p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                         <option value="un">un</option>
@@ -90,7 +105,6 @@
                         <option value="ml">ml</option>
                     </select>
                     <input type="number" id="preco" placeholder="Preço R$" class="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                    <input type="date" id="data" class="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                 </div>
                 <div class="flex flex-col md:flex-row gap-3 mt-4">
                     <button id="add-btn" class="w-full md:w-auto bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-all flex-grow">
@@ -104,13 +118,16 @@
             
             <!-- Filtros e Ações -->
             <div class="filters-container flex flex-col md:flex-row gap-4 items-center mb-6">
-                 <select id="filtroMercado" class="w-full md:w-auto p-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                    <option value="">Todos os Supermercados</option>
-                    <option value="Tauste">Tauste</option>
-                    <option value="Panelão">Panelão</option>
-                    <option value="Confiança">Confiança</option>
-                </select>
-                <input type="month" id="filtroMes" class="w-full md:w-auto p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                 <div class="flex items-center gap-2">
+                    <label class="text-sm font-medium text-slate-700 hidden md:block">Filtrar por:</label>
+                    <div id="filtroMercado-buttons" class="flex flex-wrap gap-2">
+                         <button data-filtro-supermercado="" class="filtro-mercado-btn py-1 px-3 border rounded-lg transition-all text-sm">Todos</button>
+                         <button data-filtro-supermercado="Tauste" class="filtro-mercado-btn py-1 px-3 border rounded-lg transition-all text-sm">Tauste</button>
+                         <button data-filtro-supermercado="Panelão" class="filtro-mercado-btn py-1 px-3 border rounded-lg transition-all text-sm">Panelão</button>
+                         <button data-filtro-supermercado="Confiança" class="filtro-mercado-btn py-1 px-3 border rounded-lg transition-all text-sm">Confiança</button>
+                    </div>
+                </div>
+                <input type="month" id="filtroMes" class="w-full md:w-auto p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                 <div class="flex-grow"></div>
                 <button id="export-btn" class="w-full md:w-auto bg-green-600 text-white font-semibold py-3 px-5 rounded-lg hover:bg-green-700 transition-all"><i class="fas fa-file-excel mr-2"></i>Exportar</button>
                 <button id="clear-all-btn" class="w-full md:w-auto bg-red-600 text-white font-semibold py-3 px-5 rounded-lg hover:bg-red-700 transition-all"><i class="fas fa-trash mr-2"></i>Limpar Tudo</button>
@@ -140,25 +157,10 @@
         <div id="resumo-view" class="hidden">
             <h2 class="text-2xl font-bold text-slate-800 mb-6">Resumo de Gastos do Mês</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Card de Gasto Mensal Total -->
-                <div id="resumo-mensal" class="md:col-span-3 bg-blue-100 text-blue-800 p-6 rounded-xl text-center">
-                    <!-- Conteúdo gerado via JS -->
-                </div>
-
-                <!-- Card de Resumo por Categoria -->
-                <div id="resumo-categoria" class="md:col-span-1 bg-slate-50 border border-slate-200 p-6 rounded-xl">
-                    <!-- Conteúdo gerado via JS -->
-                </div>
-
-                 <!-- Card de Resumo por Supermercado -->
-                <div id="resumo-supermercado" class="md:col-span-1 bg-slate-50 border border-slate-200 p-6 rounded-xl">
-                    <!-- Conteúdo gerado via JS -->
-                </div>
-
-                <!-- Card de Resumo por Dia -->
-                <div id="resumo-diario" class="md:col-span-1 bg-slate-50 border border-slate-200 p-6 rounded-xl">
-                    <!-- Conteúdo gerado via JS -->
-                </div>
+                <div id="resumo-mensal" class="md:col-span-3 bg-blue-100 text-blue-800 p-6 rounded-xl text-center"></div>
+                <div id="resumo-categoria" class="md:col-span-1 bg-slate-50 border border-slate-200 p-6 rounded-xl"></div>
+                <div id="resumo-supermercado" class="md:col-span-1 bg-slate-50 border border-slate-200 p-6 rounded-xl"></div>
+                <div id="resumo-diario" class="md:col-span-1 bg-slate-50 border border-slate-200 p-6 rounded-xl"></div>
             </div>
         </div>
     </div>
@@ -188,19 +190,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const state = {
         items: [],
         editIndex: -1,
+        selectedCategory: null,
+        selectedSupermercado: null,
+        selectedFiltroSupermercado: "",
     };
 
     const UIElements = {
-        // Abas
         lancamentosTab: document.getElementById('lancamentos-tab'),
         resumoTab: document.getElementById('resumo-tab'),
         lancamentosView: document.getElementById('lancamentos-view'),
         resumoView: document.getElementById('resumo-view'),
         
-        // Formulário
         produto: document.getElementById('produto'),
-        supermercado: document.getElementById('supermercado'),
-        categoria: document.getElementById('categoria'),
+        supermercadoButtons: document.getElementById('supermercado-buttons'),
+        categoriaButtons: document.getElementById('categoria-buttons'),
         quantidade: document.getElementById('quantidade'),
         unidade: document.getElementById('unidade'),
         preco: document.getElementById('preco'),
@@ -208,20 +211,17 @@ document.addEventListener('DOMContentLoaded', () => {
         addBtn: document.getElementById('add-btn'),
         clearFormBtn: document.getElementById('clear-form-btn'),
         
-        // Filtros e Ações
-        filtroMercado: document.getElementById('filtroMercado'),
+        filtroMercadoButtons: document.getElementById('filtroMercado-buttons'),
         filtroMes: document.getElementById('filtroMes'),
         exportBtn: document.getElementById('export-btn'),
         clearAllBtn: document.getElementById('clear-all-btn'),
         
-        // Exibição de Dados
         tabelaCorpo: document.getElementById('tabela-corpo'),
         resumoMensal: document.getElementById('resumo-mensal'),
         resumoCategoria: document.getElementById('resumo-categoria'),
         resumoSupermercado: document.getElementById('resumo-supermercado'),
         resumoDiario: document.getElementById('resumo-diario'),
 
-        // Modal e Toast
         modal: document.getElementById('modal'),
         modalTitle: document.getElementById('modal-title'),
         modalMessage: document.getElementById('modal-message'),
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // -------------------------------------------------------------------------
-    // Lógica de Navegação
+    // Lógica de Navegação e UI
     // -------------------------------------------------------------------------
 
     const switchTab = (tabName) => {
@@ -249,13 +249,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
+    const updateCategoryButtons = (selectedCategory) => {
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.toggle('btn-selected-blue', btn.dataset.category === selectedCategory);
+        });
+        state.selectedCategory = selectedCategory;
+    };
+    
+    const updateSupermercadoButtons = (selectedSupermercado) => {
+        document.querySelectorAll('.supermercado-btn').forEach(btn => {
+            btn.classList.toggle('btn-selected-blue', btn.dataset.supermercado === selectedSupermercado);
+        });
+        state.selectedSupermercado = selectedSupermercado;
+    };
+
+    const updateFiltroSupermercadoButtons = (selectedSupermercado) => {
+        document.querySelectorAll('.filtro-mercado-btn').forEach(btn => {
+            btn.classList.toggle('btn-selected-blue', btn.dataset.filtroSupermercado === selectedSupermercado);
+        });
+        state.selectedFiltroSupermercado = selectedSupermercado;
+    };
+
     // -------------------------------------------------------------------------
     // Funções Utilitárias
     // -------------------------------------------------------------------------
     
-    const saveState = () => localStorage.setItem('itensGastosSupermercadoV4', JSON.stringify(state.items));
+    const saveState = () => localStorage.setItem('itensGastosSupermercadoV6', JSON.stringify(state.items));
     const loadState = () => {
-        const savedItems = localStorage.getItem('itensGastosSupermercadoV4');
+        const savedItems = localStorage.getItem('itensGastosSupermercadoV6');
         if (savedItems) state.items = JSON.parse(savedItems);
     };
 
@@ -295,13 +316,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const clearForm = () => {
         UIElements.produto.value = '';
-        UIElements.supermercado.value = '';
-        UIElements.categoria.value = '';
         UIElements.quantidade.value = '';
         UIElements.preco.value = '';
         UIElements.data.value = '';
         UIElements.unidade.value = 'un';
         state.editIndex = -1;
+        updateCategoryButtons(null);
+        updateSupermercadoButtons(null);
+        
         UIElements.addBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> Adicionar Item';
         UIElements.addBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
         UIElements.addBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
@@ -310,14 +332,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleAddItem = () => {
         const produto = UIElements.produto.value.trim();
-        const supermercado = UIElements.supermercado.value;
-        const categoria = UIElements.categoria.value;
+        const supermercado = state.selectedSupermercado;
+        const categoria = state.selectedCategory;
         const quantidade = parseFloat(UIElements.quantidade.value);
         const preco = parseFloat(UIElements.preco.value);
         const data = UIElements.data.value || new Date().toISOString().split('T')[0];
 
         if (!produto || !supermercado || !categoria || isNaN(quantidade) || isNaN(preco) || !data) {
-            showToast('Por favor, preencha todos os campos.', 'error');
+            showToast('Por favor, preencha todos os campos e selecione supermercado/categoria.', 'error');
             return;
         }
 
@@ -345,8 +367,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!item) return;
 
         UIElements.produto.value = item.produto;
-        UIElements.supermercado.value = item.supermercado;
-        UIElements.categoria.value = item.categoria;
+        updateSupermercadoButtons(item.supermercado);
+        updateCategoryButtons(item.categoria);
         UIElements.quantidade.value = item.quantidade;
         UIElements.unidade.value = item.unidade;
         UIElements.preco.value = item.preco;
@@ -363,48 +385,35 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleRemoveItem = (index) => {
-        showModal(
-            'Excluir Item',
-            `Tem certeza que deseja excluir o item "${state.items[index].produto}"?`,
-            () => {
-                state.items.splice(index, 1);
-                render();
-                saveState();
-                showToast('Item excluído.', 'info');
-            }
-        );
+        showModal('Excluir Item', `Tem certeza que deseja excluir o item "${state.items[index].produto}"?`, () => {
+            state.items.splice(index, 1);
+            render();
+            saveState();
+            showToast('Item excluído.', 'info');
+        });
     };
 
     const handleClearAll = () => {
-        showModal(
-            'Limpar Tudo',
-            'Você tem certeza que deseja apagar TODOS os itens? Esta ação é irreversível.',
-            () => {
-                state.items = [];
-                state.editIndex = -1;
-                clearForm();
-                render();
-                saveState();
-                showToast('Todos os itens foram apagados.', 'info');
-            }
-        );
+        showModal('Limpar Tudo', 'Você tem certeza que deseja apagar TODOS os itens? Esta ação é irreversível.', () => {
+            state.items = [];
+            clearForm();
+            render();
+            saveState();
+            showToast('Todos os itens foram apagados.', 'info');
+        });
     };
 
     // -------------------------------------------------------------------------
-    // Funções de Análise e Comparação de Preços
+    // Análise e Renderização
     // -------------------------------------------------------------------------
 
     const getPriceComparisonData = () => {
         const priceGroups = {};
-        // Usa todos os itens para a comparação, não apenas os filtrados
         state.items.forEach(item => {
             const productNameKey = item.produto.trim().toLowerCase();
-            if (!priceGroups[productNameKey]) {
-                priceGroups[productNameKey] = [];
-            }
+            if (!priceGroups[productNameKey]) priceGroups[productNameKey] = [];
             priceGroups[productNameKey].push(item);
         });
-
         const minPrices = {};
         for (const product in priceGroups) {
             minPrices[product] = Math.min(...priceGroups[product].map(i => i.preco));
@@ -412,10 +421,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return { priceGroups, minPrices };
     };
     
-    // -------------------------------------------------------------------------
-    // Renderização
-    // -------------------------------------------------------------------------
-
     const renderSummary = (items) => {
         const summary = items.reduce((acc, item) => {
             const total = item.quantidade * item.preco;
@@ -452,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const render = () => {
-        const filtroMercado = UIElements.filtroMercado.value;
+        const filtroMercado = state.selectedFiltroSupermercado;
         const filtroMes = UIElements.filtroMes.value || new Date().toISOString().slice(0, 7);
         if (!UIElements.filtroMes.value) { UIElements.filtroMes.value = filtroMes; }
 
@@ -478,14 +483,10 @@ document.addEventListener('DOMContentLoaded', () => {
             let comparativoHTML = '-';
             if (priceGroups[productNameKey] && priceGroups[productNameKey].length > 1) {
                 if (item.preco <= menorPreco) {
-                    comparativoHTML = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                          <i class="fas fa-check-circle mr-1.5"></i> Melhor Preço
-                                       </span>`;
+                    comparativoHTML = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1.5"></i> Melhor Preço</span>`;
                 } else {
                     const diferenca = (((item.preco - menorPreco) / menorPreco) * 100);
-                    comparativoHTML = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                          +${diferenca.toFixed(0)}%
-                                       </span>`;
+                    comparativoHTML = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">+${diferenca.toFixed(0)}%</span>`;
                 }
             }
 
@@ -517,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------------------
 
     const handleExportExcel = () => {
-        const filtroMercado = UIElements.filtroMercado.value;
+        const filtroMercado = state.selectedFiltroSupermercado;
         const filtroMes = UIElements.filtroMes.value;
         const filteredItems = state.items.filter(item => 
             (!filtroMercado || item.supermercado === filtroMercado) &&
@@ -525,34 +526,22 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         
         if (filteredItems.length === 0) {
-            showToast('Nenhum dado para exportar com os filtros atuais.', 'info');
-            return;
+            showToast('Nenhum dado para exportar com os filtros atuais.', 'info'); return;
         }
 
         const { priceGroups, minPrices } = getPriceComparisonData();
-
         const dataToExport = filteredItems.map(item => {
             const productNameKey = item.produto.trim().toLowerCase();
             const menorPreco = minPrices[productNameKey];
             let comparativo = '-';
-
             if (priceGroups[productNameKey] && priceGroups[productNameKey].length > 1) {
-                if (item.preco <= menorPreco) {
-                    comparativo = 'Melhor Preço';
-                } else {
-                    const diferenca = (((item.preco - menorPreco) / menorPreco) * 100);
-                    comparativo = `+${diferenca.toFixed(0)}%`;
-                }
+                if (item.preco <= menorPreco) comparativo = 'Melhor Preço';
+                else comparativo = `+${(((item.preco - menorPreco) / menorPreco) * 100).toFixed(0)}%`;
             }
-
             return {
-                'Produto': item.produto,
-                'Categoria': item.categoria,
-                'Supermercado': item.supermercado,
-                'Comparativo de Preço': comparativo,
-                'Quantidade': `${item.quantidade} ${item.unidade}`,
-                'Preço Unitário': item.preco,
-                'Total': item.quantidade * item.preco,
+                'Produto': item.produto, 'Categoria': item.categoria, 'Supermercado': item.supermercado,
+                'Comparativo de Preço': comparativo, 'Quantidade': `${item.quantidade} ${item.unidade}`,
+                'Preço Unitário': item.preco, 'Total': item.quantidade * item.preco,
                 'Data': formatDate(item.data) + '/' + item.data.slice(0, 4)
             };
         });
@@ -575,12 +564,30 @@ document.addEventListener('DOMContentLoaded', () => {
     UIElements.clearFormBtn.addEventListener('click', clearForm);
     UIElements.clearAllBtn.addEventListener('click', handleClearAll);
     UIElements.exportBtn.addEventListener('click', handleExportExcel);
-    UIElements.filtroMercado.addEventListener('change', render);
     UIElements.filtroMes.addEventListener('change', render);
     UIElements.modalCancel.addEventListener('click', hideModal);
     UIElements.modal.addEventListener('click', (e) => e.target === UIElements.modal && hideModal());
 
+    UIElements.supermercadoButtons.addEventListener('click', (e) => {
+        const btn = e.target.closest('.supermercado-btn');
+        if (btn) updateSupermercadoButtons(btn.dataset.supermercado);
+    });
+
+    UIElements.categoriaButtons.addEventListener('click', (e) => {
+        const btn = e.target.closest('.category-btn');
+        if (btn) updateCategoryButtons(btn.dataset.category);
+    });
+    
+    UIElements.filtroMercadoButtons.addEventListener('click', (e) => {
+        const btn = e.target.closest('.filtro-mercado-btn');
+        if (btn) {
+            updateFiltroSupermercadoButtons(btn.dataset.filtroSupermercado);
+            render();
+        }
+    });
+
     loadState();
+    updateFiltroSupermercadoButtons(""); // Garante que "Todos" seja selecionado inicialmente
     render();
 });
 </script>
